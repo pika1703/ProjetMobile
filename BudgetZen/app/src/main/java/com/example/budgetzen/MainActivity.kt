@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             BudgetZenTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "BudgetZen",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
