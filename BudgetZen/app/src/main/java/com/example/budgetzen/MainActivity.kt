@@ -9,7 +9,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -27,14 +29,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import co.yml.charts.ui.piechart.charts.PieChart
-import co.yml.charts.ui.piechart.models.PieChartConfig
-import co.yml.charts.ui.piechart.models.PieChartData
+import com.example.budgetzen.chart.ExpensePieChart
 import com.example.budgetzen.data.Expense
 import com.example.budgetzen.data.ExpenseDatabase
 import com.example.budgetzen.ui.theme.BudgetZenTheme
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,6 +126,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -140,8 +144,14 @@ fun HomeScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("${expense.name} - ${expense.amount}€", style = MaterialTheme.typography.titleMedium)
-                        Text("${expense.category} • ${expense.date}", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            "${expense.name} - ${expense.amount}€",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            "${expense.category} • ${expense.date}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
@@ -155,6 +165,13 @@ fun HomeScreen(
         ) {
             Text("Voir plus")
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+
+        ExpensePieChart()
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -199,11 +216,11 @@ fun AddExpenseScreen() {
                         TextButton(onClick = {
                             val millis = datePickerState.selectedDateMillis
                             if (millis != null) {
-                                val formatter = java.text.SimpleDateFormat(
+                                val formatter = SimpleDateFormat(
                                     "dd/MM/yyyy",
-                                    java.util.Locale.getDefault()
+                                    Locale.getDefault()
                                 )
-                                selectedDate = formatter.format(java.util.Date(millis))
+                                selectedDate = formatter.format(Date(millis))
                             }
                             showDatePicker = false
                         }) {
@@ -345,7 +362,7 @@ fun AddExpenseScreen() {
 
 @Composable
 fun SummaryScreen() {
-
+    ExpensePieChart()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -588,5 +605,4 @@ fun EditExpenseDialog(
         }
     )
 }
-
 
