@@ -12,11 +12,11 @@ interface ExpenseDao {
     @Insert
     suspend fun insertExpense(expense: Expense)
 
-    @Query("SELECT * FROM expenses ORDER BY id DESC")
+    @Query("SELECT * FROM expenses ORDER BY date DESC")
     fun getAllExpenses(): Flow<List<Expense>>
 
     // Récupérer les dernières dépenses selon la valeur de limit (pour la page d'accueil)
-    @Query("SELECT * FROM expenses ORDER BY id DESC LIMIT :limit")
+    @Query("SELECT * FROM expenses ORDER BY date DESC LIMIT :limit")
     fun getLastExpenses(limit: Int): Flow<List<Expense>>
 
     @Delete

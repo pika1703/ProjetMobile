@@ -149,7 +149,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            "${expense.category} • ${expense.date}",
+                            "${expense.category} • ${expense.date.toDisplayDate()}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -183,6 +183,7 @@ fun AddExpenseScreen() {
     var category by remember { mutableStateOf("Alimentation") }
     var name by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf("") }
+    var displayDate by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -217,10 +218,16 @@ fun AddExpenseScreen() {
                             val millis = datePickerState.selectedDateMillis
                             if (millis != null) {
                                 val formatter = SimpleDateFormat(
-                                    "dd/MM/yyyy",
+                                    "yyyy-MM-dd",
                                     Locale.getDefault()
                                 )
                                 selectedDate = formatter.format(Date(millis))
+
+                                val frFormatter = SimpleDateFormat(
+                                    "dd/MM/yyyy",
+                                    Locale.getDefault()
+                                )
+                                displayDate = frFormatter.format(Date(millis))
                             }
                             showDatePicker = false
                         }) {
@@ -307,7 +314,7 @@ fun AddExpenseScreen() {
 
                 // Sélecteur de date
                 OutlinedTextField(
-                    value = selectedDate,
+                    value = displayDate,
                     onValueChange = {},
                     label = { Text("Date") },
                     modifier = Modifier.fillMaxWidth()
@@ -341,6 +348,7 @@ fun AddExpenseScreen() {
                                 amount = ""
                                 name = ""
                                 selectedDate = ""
+                                displayDate = ""
                                 category = "Alimentation"
                             }
                         } else {
@@ -362,7 +370,6 @@ fun AddExpenseScreen() {
 
 @Composable
 fun SummaryScreen() {
-    ExpensePieChart()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -420,7 +427,7 @@ fun AllExpensesScreen(onBackClicked: () -> Unit) {
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                     Text(
-                                        "${expense.category} • ${expense.date}",
+                                        "${expense.category} • ${expense.date.toDisplayDate()}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -458,7 +465,7 @@ fun AllExpensesScreen(onBackClicked: () -> Unit) {
                 TextButton(onClick = {
                     scope.launch {
                         dao.deleteExpense(expenseToDelete!!)
-                        snackbarHostState.showSnackbar("🗑️ Dépense supprimée")
+                        snackbarHostState.showSnackbar("Dépense supprimée")
                         expenseToDelete = null
                     }
                 }) { Text("Supprimer", color = Color.Red) }
@@ -498,6 +505,7 @@ fun EditExpenseDialog(
     var category by remember { mutableStateOf(expense.category) }
     var name by remember { mutableStateOf(expense.name) }
     var date by remember { mutableStateOf(expense.date) }
+    var displayDate by remember { mutableStateOf(expense.date.toDisplayDate())}
     var showDatePicker by remember { mutableStateOf(false) }
 
     val categories = listOf("Alimentation", "Transport", "Logement","Loisirs", "Autres")
@@ -572,7 +580,7 @@ fun EditExpenseDialog(
                 }
                 // Date
                 OutlinedTextField(
-                    value = date,
+                    value = displayDate,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Date") },
@@ -596,7 +604,12 @@ fun EditExpenseDialog(
                     val day = calendar.get(Calendar.DAY_OF_MONTH)
                     DatePickerDialog(
                         context,
-                        { _, y, m, d -> date = "$d/${m + 1}/$y" },
+                        { _, y, m, d ->
+                            val month = (m + 1).toString().padStart(2, '0')
+                            val day = d.toString().padStart(2, '0')
+                            date = "$y-$month-$day"
+                            displayDate = "$day/$month/$y"
+                        },
                         year, month, day
                     ).show()
                     showDatePicker = false
@@ -606,3 +619,16 @@ fun EditExpenseDialog(
     )
 }
 
+fun String.toDisplayDate(): String {
+    return try {
+        val parts = this.split("-") // yyyy-MM-dd
+        if (parts.size == 3) {
+            val year = parts[0]
+            val month = parts[1]
+            val day = parts[2]
+            "$day/$month/$year"
+        } else this
+    } catch (_: Exception) {
+        this
+    }
+}

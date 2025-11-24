@@ -44,9 +44,9 @@ fun ExpensePieChart() {
     // Filtrer les dépenses du mois en cours
     val monthExpenses = allExpenses.filter {
         try {
-            val parts = it.date.split("/") // Format: "jour/mois/année"
+            val parts = it.date.split("-") // Format: "année-mois-jour"
+            val year = parts[0].toInt()
             val month = parts[1].toInt()
-            val year = parts[2].toInt()
             month == currentMonth && year == currentYear
         } catch (_: Exception) {
             false
@@ -94,7 +94,7 @@ fun ExpensePieChart() {
         plotType = PlotType.Donut
     )
     val pieChartConfig = PieChartConfig(
-        showSliceLabels = true,
+        showSliceLabels = false,
         isAnimationEnable = true,
         labelColor = Color.Black,
         activeSliceAlpha = 0.8f,
