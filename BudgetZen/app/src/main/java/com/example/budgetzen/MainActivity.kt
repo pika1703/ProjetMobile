@@ -32,7 +32,11 @@ import androidx.compose.ui.unit.dp
 import com.example.budgetzen.chart.ExpensePieChart
 import com.example.budgetzen.data.Expense
 import com.example.budgetzen.data.ExpenseDatabase
+import com.example.budgetzen.data.BudgetRepository
 import com.example.budgetzen.ui.theme.BudgetZenTheme
+import com.example.budgetzen.util.calculateMonthTotal
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -121,7 +125,14 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val dao = remember { ExpenseDatabase.getDatabase(context).expenseDao() }
+    val allExpenses by dao.getAllExpenses().collectAsState(initial = emptyList())
     val lastExpenses by dao.getLastExpenses(3).collectAsState(initial = emptyList())
+
+    // Calcul du total du mois actuel
+    val monthTotal = calculateMonthTotal(allExpenses)
+
+    val budgetRepo = remember { BudgetRepository(context) }
+    val budget by budgetRepo.budgetFlow.collectAsState(initial = 0.0)
 
     Column(
         modifier = Modifier
@@ -130,6 +141,17 @@ fun HomeScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Section Budget
+        HomeBudgetSection(
+            monthTotal = monthTotal,
+            budgetValue = budget,
+            onBudgetChanged = { newBudget ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    budgetRepo.saveBudget(newBudget)
+                }
+            }
+        )
+
         Text(
             "Dernières dépenses",
             style = MaterialTheme.typography.headlineSmall
@@ -630,5 +652,55 @@ fun String.toDisplayDate(): String {
         } else this
     } catch (_: Exception) {
         this
+    }
+}
+
+@Composable
+fun HomeBudgetSection(
+    monthTotal: Double, // somme dépenses du mois
+    onBudgetChanged: (Double) -> Unit,
+    budgetValue: Double
+) {
+    Column(Modifier.padding(16.dp)) {
+
+        Text(
+            "Budget du mois",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        var text by remember { mutableStateOf("") }
+
+        LaunchedEffect(budgetValue) {
+            if (budgetValue != 0.0) {
+                text = budgetValue.toString()
+            }
+        }
+
+        TextField(
+            value = text,
+            onValueChange = {
+                text = it
+                it.toDoubleOrNull()?.let { value ->
+                    onBudgetChanged(value)
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            placeholder = { Text("Entrez votre budget (€)") },
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        val remaining = budgetValue - monthTotal
+
+        Text(
+            "Solde restant : ${"%.2f".format(remaining)} €",
+            style = MaterialTheme.typography.titleMedium,
+            color = if (remaining >= 0) Color(0xFF4CAF50) else Color(0xFFE53935)
+        )
     }
 }
