@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.budgetzen.chart.ExpensePieChart
+import com.example.budgetzen.chart.MonthlyBarChart
 import com.example.budgetzen.data.Expense
 import com.example.budgetzen.data.ExpenseDatabase
 import com.example.budgetzen.data.BudgetRepository
@@ -392,6 +393,15 @@ fun AddExpenseScreen() {
 
 @Composable
 fun SummaryScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        MonthlyBarChart()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -665,7 +675,7 @@ fun HomeBudgetSection(
 
         Text(
             "Budget du mois",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(Modifier.height(8.dp))
