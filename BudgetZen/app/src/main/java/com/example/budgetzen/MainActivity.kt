@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,8 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.budgetzen.chart.ExpensePieChart
 import com.example.budgetzen.chart.MonthlyBarChart
 import com.example.budgetzen.data.Expense
@@ -393,6 +396,12 @@ fun AddExpenseScreen() {
 
 @Composable
 fun SummaryScreen() {
+    val context = LocalContext.current
+    val dao = remember { ExpenseDatabase.getDatabase(context).expenseDao() }
+    val allExpenses by dao.getAllExpenses().collectAsState(initial = emptyList())
+
+    val totalSpent = allExpenses.sumOf { it.amount }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -400,6 +409,15 @@ fun SummaryScreen() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        TotalSpentCard(total = totalSpent)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            "Dépenses les 6 derniers mois",
+            style = MaterialTheme.typography.headlineSmall
+        )
+
         MonthlyBarChart()
     }
 }
@@ -714,3 +732,54 @@ fun HomeBudgetSection(
         )
     }
 }
+
+@Composable
+fun TotalSpentCard(
+    total: Double,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE8F0FF)   // bleu clair
+        ),
+        elevation = CardDefaults.cardElevation(6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+
+            // Icône
+            Icon(
+                painter = painterResource(id = R.drawable.ic_money),
+                contentDescription = "Total dépensé",
+                tint = Color(0xFF1A73E8),
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Texte
+            Column {
+                Text(
+                    text = "Total dépensé",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "%.2f €".format(total),
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A73E8)
+                )
+            }
+        }
+    }
+}
+
