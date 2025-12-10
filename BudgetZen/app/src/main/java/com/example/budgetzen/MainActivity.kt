@@ -349,11 +349,14 @@ fun AddExpenseScreen() {
 
                 Button(
                     onClick = {
-                        if (amount.isNotBlank() && name.isNotBlank() && selectedDate.isNotBlank()) {
+                        if (amount.isNotBlank() && selectedDate.isNotBlank()) {
+                            // Cas du champ nom non rempli
+                            val finalName = if (name.isBlank()) "Dépense" else name
+
                             val expense = Expense(
                                 amount = amount.toDouble(),
                                 category = category,
-                                name = name,
+                                name = finalName,
                                 date = selectedDate
                             )
                             scope.launch() {
@@ -370,7 +373,7 @@ fun AddExpenseScreen() {
                             }
                         } else {
                             scope.launch {
-                                snackbarHostState.showSnackbar("Merci de remplir tous les champs.")
+                                snackbarHostState.showSnackbar("Merci de remplir tous les champs obligatoires.")
                             }
                         }
                     },
