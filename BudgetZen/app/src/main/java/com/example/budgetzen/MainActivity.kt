@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +27,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -335,23 +338,12 @@ fun AddExpenseScreen() {
                 )
 
                 // Sélecteur de date
-                OutlinedTextField(
+                ClickableDateField(
                     value = displayDate,
-                    onValueChange = {},
-                    label = { Text("Date") },
+                    onClick = { showDatePicker = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showDatePicker = true },
-                    readOnly = true,
-
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(
-                                painter = painterResource(id = android.R.drawable.ic_menu_today),
-                                contentDescription = "Choisir une date"
-                            )
-                        }
-                    }
+                        .padding(top = 8.dp)
                 )
 
                 // Bouton Enregistrer
@@ -651,7 +643,16 @@ fun EditExpenseDialog(
                         }
                     }
                 }
-                // Date
+
+                // Sélecteur de date
+                ClickableDateField(
+                    value = displayDate,
+                    onClick = { showDatePicker = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+                /*
                 OutlinedTextField(
                     value = displayDate,
                     onValueChange = {},
@@ -668,7 +669,7 @@ fun EditExpenseDialog(
                             )
                         }
                     }
-                )
+                )*/
                 if (showDatePicker) {
                     val context = LocalContext.current
                     val calendar = Calendar.getInstance()
@@ -805,3 +806,37 @@ fun TotalSpentCard(
     }
 }
 
+@Composable
+fun ClickableDateField(
+    value: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val displayValue = value.ifBlank { "Date" }
+
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+                .clickable { onClick() }
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = displayValue,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Icon(
+                painter = painterResource(id = android.R.drawable.ic_menu_today),
+                contentDescription = "Choisir une date"
+            )
+        }
+    }
+}
