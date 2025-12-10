@@ -269,17 +269,6 @@ fun AddExpenseScreen() {
                     DatePicker(state = datePickerState)
                 }
             }
-/*
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Ajouter une dépense",
-                    style = MaterialTheme.typography.headlineSmall
-                )*/
 
                 // Champ Montant
                 OutlinedTextField(
@@ -367,9 +356,11 @@ fun AddExpenseScreen() {
                                 name = name,
                                 date = selectedDate
                             )
-                            scope.launch {
+                            scope.launch() {
                                 dao.insertExpense(expense)
-                                snackbarHostState.showSnackbar("Dépense enregistrée !")
+                                launch {
+                                    snackbarHostState.showSnackbar("Dépense enregistrée !")
+                                }
                                 // Réinitialiser les champs
                                 amount = ""
                                 name = ""
@@ -515,7 +506,9 @@ fun AllExpensesScreen(onBackClicked: () -> Unit) {
                 TextButton(onClick = {
                     scope.launch {
                         dao.deleteExpense(expenseToDelete!!)
-                        snackbarHostState.showSnackbar("Dépense supprimée")
+                        launch{
+                            snackbarHostState.showSnackbar("Dépense supprimée")
+                        }
                         expenseToDelete = null
                     }
                 }) { Text("Supprimer", color = Color.Red) }
@@ -536,7 +529,9 @@ fun AllExpensesScreen(onBackClicked: () -> Unit) {
             onSave = { updated ->
                 scope.launch {
                     dao.updateExpense(updated)
-                    snackbarHostState.showSnackbar("Dépense modifiée")
+                    launch{
+                        snackbarHostState.showSnackbar("Dépense modifiée")
+                    }
                     expenseToEdit = null
                 }
             }
