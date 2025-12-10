@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.budgetzen.chart.ExpensePieChart
@@ -170,10 +171,23 @@ fun HomeScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text(
-                            "${expense.name} - ${expense.amount}€",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = expense.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+
+                            Text(
+                                text = " - ${expense.amount}€",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
                         Text(
                             "${expense.category} • ${expense.date.toDisplayDate()}",
                             style = MaterialTheme.typography.bodyMedium
@@ -183,8 +197,6 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
         Button(
             onClick = onSeeMoreClicked,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -192,12 +204,7 @@ fun HomeScreen(
             Text("Voir plus")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-
         ExpensePieChart()
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -465,11 +472,29 @@ fun AllExpensesScreen(onBackClicked: () -> Unit) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
-                                    Text(
-                                        "${expense.name} - ${expense.amount}€",
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Nom
+                                        Text(
+                                            text = expense.name,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f, fill = false)
+                                        )
+
+                                        // Montant
+                                        Text(
+                                            text = " - ${expense.amount}€",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            maxLines = 1
+                                        )
+                                    }
                                     Text(
                                         "${expense.category} • ${expense.date.toDisplayDate()}",
                                         style = MaterialTheme.typography.bodyMedium
@@ -586,14 +611,16 @@ fun EditExpenseDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nom") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
                     label = { Text("Montant (€)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 // Catégorie
                 var expanded by remember { mutableStateOf(false) }
