@@ -143,7 +143,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Section Budget
@@ -339,7 +339,8 @@ fun AddExpenseScreen() {
                     value = displayDate,
                     onValueChange = {},
                     label = { Text("Date") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .clickable { showDatePicker = true },
                     readOnly = true,
 
@@ -353,7 +354,7 @@ fun AddExpenseScreen() {
                     }
                 )
 
-
+                // Bouton Enregistrer
                 Button(
                     onClick = {
                         if (amount.isNotBlank() && selectedDate.isNotBlank()) {
@@ -406,13 +407,10 @@ fun SummaryScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         TotalSpentCard(total = totalSpent)
-
-        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             "Dépenses les 6 derniers mois",
@@ -765,8 +763,7 @@ fun TotalSpentCard(
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE8F0FF)   // bleu clair

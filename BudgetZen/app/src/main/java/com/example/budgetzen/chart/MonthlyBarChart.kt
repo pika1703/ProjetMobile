@@ -88,7 +88,7 @@ fun MonthlyBarChart() {
         .startPadding(8.dp)
         .endPadding(8.dp)
         //.axisStepSize(8.dp)
-        .bottomPadding(20.dp)
+        .bottomPadding(8.dp)
         .startDrawPadding(16.dp)
         .axisLabelAngle(0f)
         .labelData { index -> barChartList[index].label ?: "" }
@@ -107,8 +107,9 @@ fun MonthlyBarChart() {
     // Config Y axis
     val yAxis = AxisData.Builder()
         .steps(5)
-        .startPadding(8.dp)
-        .endPadding(8.dp)
+        //.startPadding(8.dp)
+        //.endPadding(8.dp)
+        .labelAndAxisLinePadding(8.dp)
         .labelData { valueIndex ->
             val y = valueIndex * (maxValue/5)
             "%.0f".format(y)
@@ -139,8 +140,8 @@ fun MonthlyBarChart() {
     ) {
         BarChart(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 4.dp, end = 4.dp),
+                .fillMaxSize(),
+                //.padding(start = 4.dp, end = 4.dp),
             barChartData = barChartData,
         )
     }
