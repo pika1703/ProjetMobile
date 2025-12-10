@@ -713,7 +713,7 @@ fun HomeBudgetSection(
     onBudgetChanged: (Double) -> Unit,
     budgetValue: Double
 ) {
-    Column(Modifier.padding(16.dp)) {
+    Column(Modifier.padding(8.dp)) {
 
         Text(
             "Budget du mois",
