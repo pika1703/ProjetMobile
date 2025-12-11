@@ -76,17 +76,17 @@ fun MainScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_budgetzen_logo),
+                            painter = painterResource(id = R.drawable.ic_budgetzen_logo_no_bg),
                             contentDescription = "Logo",
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(48.dp)
                                 .padding(end = 8.dp)
                         )
                         Text("BudgetZen")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1976D2),
+                    containerColor = Color(0xFFD0BCFF),
                     titleContentColor = Color.White
                 )
             )
