@@ -109,7 +109,7 @@ fun MonthlyBarChart() {
         .steps(5)
         //.startPadding(8.dp)
         //.endPadding(8.dp)
-        .labelAndAxisLinePadding(8.dp)
+        .labelAndAxisLinePadding(32.dp)
         .labelData { valueIndex ->
             val y = valueIndex * (maxValue/5)
             "%.0f".format(y)
