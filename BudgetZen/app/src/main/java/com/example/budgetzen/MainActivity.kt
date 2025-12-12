@@ -65,7 +65,11 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+    // ---- Gestion de l'état de la navigation ----
+    // `selectedTab` contrôle la navigation principale via la BottomNavigationBar.
     var selectedTab by remember { mutableStateOf(0) }
+    // `showAllExpenses` est un état secondaire pour afficher un écran de détail
+    // par-dessus l'écran d'accueil, sans changer l'onglet sélectionné.
     var showAllExpenses by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -116,7 +120,12 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
+        // Le `Box` contient le contenu principal de l'écran.
+        // `innerPadding` est fourni par le Scaffold pour éviter que le contenu
+        // ne soit caché par les Top/Bottom bars.
         Box(modifier = Modifier.padding(innerPadding)) {
+            // ---- Logique de routage (Navigation) ----
+            // Un `when` contrôle quel écran est affiché en fonction de l'état.
             when {
                 showAllExpenses -> AllExpensesScreen(onBackClicked = { showAllExpenses = false })
                 selectedTab == 0 -> HomeScreen(onSeeMoreClicked = { showAllExpenses = true })
@@ -149,7 +158,7 @@ fun HomeScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Section Budget
+        // Section Budget : pour afficher et modifier le budget
         HomeBudgetSection(
             monthTotal = monthTotal,
             budgetValue = budget,
@@ -168,6 +177,7 @@ fun HomeScreen(
         if (lastExpenses.isEmpty()) {
             Text("Aucune dépense enregistrée pour le moment.")
         } else {
+            // Affichage des dernières dépenses dans des cartes.
             lastExpenses.forEach { expense ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -199,7 +209,7 @@ fun HomeScreen(
                 }
             }
         }
-
+        // Le bouton "Voir plus" déclenche le callback qui changera l'état `showAllExpenses`.
         Button(
             onClick = onSeeMoreClicked,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -207,6 +217,7 @@ fun HomeScreen(
             Text("Voir plus")
         }
 
+        // Graphique circulaire du mois
         ExpensePieChart()
     }
 }
@@ -215,13 +226,14 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen() {
+    // ---- Ecran pour l'ajout de dépense ----
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Alimentation") }
     var name by remember { mutableStateOf("") }
-    var selectedDate by remember { mutableStateOf("") }
-    var displayDate by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    var showDatePicker by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf("") } // Date au format YYYY-MM-DD pour la BDD
+    var displayDate by remember { mutableStateOf("") } // Date au format DD/MM/YYYY pour l'affichage
+    var expanded by remember { mutableStateOf(false) } // État pour le menu déroulant
+    var showDatePicker by remember { mutableStateOf(false) } // État pour afficher/cacher le DatePickerDialog
 
     val categories = listOf("Alimentation", "Transport","Logement", "Loisirs", "Autres")
 
@@ -232,6 +244,7 @@ fun AddExpenseScreen() {
     val dao = db.expenseDao()
     val scope = rememberCoroutineScope()
 
+    // `SnackbarHostState` pour afficher des messages temporaires (ex: "Dépense enregistrée !").
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -253,6 +266,7 @@ fun AddExpenseScreen() {
                         TextButton(onClick = {
                             val millis = datePickerState.selectedDateMillis
                             if (millis != null) {
+                                // Formattage de la date pour la base de données et pour l'affichage.
                                 val formatter = SimpleDateFormat(
                                     "yyyy-MM-dd",
                                     Locale.getDefault()
@@ -295,7 +309,7 @@ fun AddExpenseScreen() {
                     )
                 )
 
-                // Catégorie
+                // Catégorie : Menu déroulant
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded }
